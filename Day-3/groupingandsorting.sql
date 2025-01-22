@@ -119,3 +119,29 @@ WHERE has_5g = 'True'
 GROUP BY brand_name
 HAVING AVG(rating) > 70 AND COUNT(*) > 10
 ORDER BY avg_price DESC; 
+
+# NEW DATASET
+SELECT * FROM ipl_data;
+
+# find top 5 batsman in ipl
+SELECT batter, SUM(total_run) AS 'total_run'
+FROM ipl_data
+GROUP BY batter
+ORDER BY total_run DESC
+LIMIT 5;
+
+# FIND THE SECOND HIGHEST SIX HITTER IN IPL
+SELECT batter, COUNT(*) AS 'total_six'
+FROM ipl_data
+WHERE batsman_run = 6
+GROUP BY batter
+ORDER BY total_six DESC
+LIMIT 1,1;
+
+#find top 5 batsman with highest strike rate who have played min 1000 balls
+SELECT batter , SUM(batsman_run) AS 'total_runs', COUNT(batsman_run) AS 'balls_played',
+(SUM(batsman_run)/COUNT(batsman_run) * 100) AS 'strike_rate'
+FROM ipl_data
+GROUP BY batter
+HAVING balls_played > 1000
+ORDER BY strike_rate DESC LIMIT 5;
