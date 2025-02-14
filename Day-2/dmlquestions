@@ -1,0 +1,42 @@
+SELECT * FROM branch;
+SELECT * FROM accounts;
+SELECT * FROM customers;
+SELECT * FROM employees;
+SELECT * FROM transactions;
+
+-- Q. Find all the employee working in Mumbai
+SELECT t1.* FROM employees t1
+INNER JOIN branch t2 ON t2.branch_code = t1.branch_code
+WHERE t2.branch_name = 'Mumbai';
+
+-- Q. Find total no of succesful trnx that belong to inactive customers
+
+SELECT COUNT(*) FROM customers t1
+JOIN accounts t2 ON t1.customer_id = t2.cust_id
+JOIN transactions t3 ON t2.account_number = t3.acc_number
+WHERE t3.status = 'Success' AND t1.is_active = 'false';
+
+-- Q. Categorise employees based on their salary
+-- (below 50K is low salary) , between 50K and 70K is Medium , above 70K is High Salary
+SELECT (first_name ||' ' || last_name) name ,
+	CASE WHEN salary < 50000 THEN 'Low Salary'
+	     WHEN salary BETWEEN 50000 AND 70000 THEN 'Medium Salary'
+	     WHEN salary > 70000 THEN 'High Salary'
+	     ELSE 'Invalid'
+	END AS category
+FROM employees;
+
+-- Q. find total balance of all savings account
+SELECT SUM(balance) balance FROM accounts
+WHERE acc_type = 'Saving';
+
+-- Q. Display the total account balance in all the loan and saving account
+SELECT SUM(balance) balance FROM accounts
+WHERE acc_type = 'Loan' OR acc_type = 'Saving';
+
+SELECT SUM(balance) balance FROM accounts
+WHERE acc_type IN ('Loan','Saving');
+
+CREATE DATABASE Sales_Order_Database;
+
+
