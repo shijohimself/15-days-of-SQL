@@ -98,37 +98,47 @@ LIMIT 5;
 # correlated subq
 # find all the movies that have a rating higher than the avg rating of movies
 #in the same genre 
-SELECT COUNT(*) FROM movies;
 SELECT * FROM movies m1
 WHERE score > (SELECT AVG(score) FROM movies m2 WHERE m2.genre = m1.genre);
 
 # FIND THE FAV FOOD OF EACH CUSTOMER
 USE zomato;
+WITH cte as (SELECT t1.user_id,t1.name,t4.f_name,COUNT(*) as 'count' FROM users t1
+            JOIN orders t2 ON t1.user_id = t2.user_id
+            JOIN order_details t3 ON t3.order_id = t2.order_id
+			JOIN food t4 ON t4.f_id = t3.f_id
+			GROUP BY t1.user_id,t1.name,t4.f_id,t4.f_name)
 
+SELECT * FROM cte m1
+WHERE count = (SELECT MAX(count) FROM cte m2 WHERE m2.user_id = m1.user_id);
 
-WITH fav_food as (
-SELECT t2.user_id,t1.name,t4.f_name,COUNT(*) as 'frequency' FROM users t1
-JOIN orders t2 ON t1.user_id = t2.user_id
-JOIN order_details t3 ON t3.order_id = t2.order_id
-JOIN food t4 ON t3.f_id = t4.f_id
-GROUP BY t2.user_id,t1.name,t3.f_id,t4.f_name
-)
-
-SELECT * FROM fav_food f1
-WHERE frequency = (SELECT MAX(frequency) FROM 
-fav_food f2 
-WHERE f2.user_id = f1.user_id);
 
 # display all movie names , genre , score and avg(score) of genre
 USE sql_cx_live;
-SELECT name,genre,score,
-(SELECT AVG(score) FROM movies m2 WHERE m1.genre = m2.genre) as 'avg_score'
-FROM movies m1;
+SELECT name,genre,score,ROUND((SELECT AVG(score) FROM movies m2 WHERE m2.genre = m1.genre),1) as 'avg_score_of_genre' FROM movies m1;
 
+# display avg rating of all the restaurants
+USE zomato;
+SELECT t1.r_id,t1.r_name,AVG(restaurant_rating) FROM restaurants t1
+JOIN orders t2 ON t1.r_id = t2.r_id
+GROUP BY r_id,r_name;
 
+# using subquery in from clause
+SELECT r_name, avg_rating
+FROM (SELECT r_id,AVG(restaurant_rating) as 'avg_rating' FROM orders
+      GROUP BY r_id) t1 JOIN restaurants t2 ON t1.r_id = t2.r_id;
 
+# find genres having avg scores > avg score of all movies
+SELECT * FROM movies;
+SELECT genre, AVG(score) FROM movies
+GROUP BY genre
+HAVING AVG(score) > (SELECT AVG(score) FROM movies);
 
-
+# using sq with insert
+USE zomato;
+SELECT user_id FROM orders t1
+JOIN users t2 ON t1.order_id = t2.order_id
+GROUP BY user_id
 
 
 
